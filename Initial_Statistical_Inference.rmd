@@ -1,0 +1,85 @@
+---
+title: "Initial Statistical Inference on 40 Exponents"
+author: "Danish Tamboli"
+date: "8/5/2020"
+output: pdf_document
+---
+
+# Initial Statistical Inference on 40 Exponents, and comparison with CLT Distribution.
+
+## Overview:
+ * Comparison between Exponential Distribution and Central Limit Theorem Distribution (Normal Distribution) of 40.
+
+### What does Central Limit Theorem state?
+ * The central limit theorem states that if you have a population with :
+   * mean mu.
+   * standard deviation sigma.
+   * Take sufficiently large random samples from the population with replacement.
+   * The distribution of the sample means will be approximately normally distributed.
+   * Here we are assuming lambda = 0.2, mu = 1\/lambda and sigma = 1\/lambda.
+   * Here we will be taking 1000 simulations or sample sets from the 40 exponents.
+   
+### Simulation:
+```{r, Expontent and clt Distribution}
+
+set.seed(103101)
+init_exp <- rexp(40,0.2)
+exp_mean <- mean(init_exp)
+print(paste("Observed Exponent Mean:", exp_mean))
+
+clt <- sapply(1:1000, function(i){mean(sample(init_exp,replace = TRUE))})
+clt_mean <- mean(clt)
+print(paste("Observed Cental Limit Theorem Mean:", clt_mean))
+```
+### Sample Mean versus Theoretical Mean:
+
+ * From the above we can discuss the Theoretical and Observed means:
+
+   * We see that as lambda is 0.2, Hence the Theoretical mean = 1\/lambda should be 5
+   * The Observed Exponent Mean and Observed Central Limit Theorem Mean is \~ the Theoretical mean. 
+
+```{r}
+
+variance_exp <- var(init_exp)
+print(paste("Observed Exponent Variance:",variance_exp))
+
+variance_clt <- var(clt)
+print(paste("Observed Cental Limit Theorem Variance:",variance_clt))
+
+```
+### Sample Variance versus Theoretical Variance: 
+
+ * From the above we can discuss the Theoretical and Observed variances:
+
+   * We see that as lambda is 0.2, Hence the Theoretical variance = sd^2, sd = (1/lambda) = 5 should be 25
+   * The Observed Exponent Variance is \~ the Theoretical mean.
+ 
+### Distribution:
+```{r, Distribution Graphs,fig.height=4,echo=FALSE}
+library(ggplot2)
+plot <- ggplot(data=as.data.frame(init_exp),aes(init_exp)) + geom_histogram(aes(init_exp, y = ..density..),color="white",fill="grey",bins = 30) + labs(x= "Density", y= "Exponent Value",title = "Distibution of 40 Exponents") + geom_vline(xintercept=5,lwd=2,col="blue") + geom_vline(xintercept = mean(init_exp),lwd=2)
+plot
+
+x <- seq(min(clt),max(clt),length=1000)
+plot1 <- ggplot(data= as.data.frame(clt),aes(clt)) + geom_histogram(aes(clt,y =..density..),color="white",fill="grey",bins = 30) + geom_line(aes(x,dnorm(x,mean(clt),sd(clt))),color="yellow",lwd=2) + labs(x = "Exponent Value", y = "Density",title = "Distribution of 1000 averages of mean of 40 Exponents") + geom_vline(xintercept=5,lwd=2,col="blue") + geom_vline(xintercept = clt_mean,lwd=2)
+plot1
+```
+
+ 
+ * From the above 2 figures we can see how the Central Limit Distribution (grey bars) is approximately normal (yellow line), as how it fits under the curve of the normal line (yellow).
+ 
+```{r,qqplots,fig.height=4,echo=FALSE}
+
+qqnorm(init_exp,main = "QQPlot of 40 Exponents",col="orange")
+qqline(init_exp,col="green")
+
+qqnorm(clt,col=c("orange",alpha=0.95))
+qqline(clt,main = "QQPlot of CLT Normal Distribution",col="green")
+
+```
+ 
+  * From the above 2 figures we can clearly see:
+    * How the 40 exponents is not normal and hence the points are not on the straight line.
+    * How the CLT Distribution is of Normal Distribution Type as majority of the points are on the straight line.
+ 
+ 
